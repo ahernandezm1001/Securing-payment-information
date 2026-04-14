@@ -1,0 +1,20 @@
+# Java y Maven
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# IntelliJ / Eclipse
+.idea/
+*.iml
+.settings/
+.project
+.classpath
+
+# Logs
+*.log

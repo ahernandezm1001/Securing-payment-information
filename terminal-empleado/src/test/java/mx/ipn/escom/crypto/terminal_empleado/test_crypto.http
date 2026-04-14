@@ -1,0 +1,39 @@
+### Intento de Login y Handshake ECDH
+POST http://localhost:8081/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "admin123",
+    "deviceId": "thinkpad-carlos-01"
+}
+
+### Enviar Ticket de Compra Cifrado
+# Esta petición simula el botón de "Cobrar" en la terminal.
+# Toma los datos en claro, los cifra con AES-GCM y los manda al servidor central.
+POST http://localhost:8081/api/payment/test-send
+Content-Type: application/json
+
+{
+    "idCliente": 1,
+    "idEmpleado": 1,
+    "noTarjetaPago": "4152313498765432",
+    "montoTotal": 1550.50,
+    "detalles": [
+        {
+            "idProducto": 1,
+            "cantidad": 2,
+            "precioUnitario": 500.00
+        },
+        {
+            "idProducto": 2,
+            "cantidad": 1,
+            "precioUnitario": 500.50
+        },
+        {
+            "idProducto": 3,
+            "cantidad": 1,
+            "precioUnitario": 50.00
+        }
+    ]
+}
