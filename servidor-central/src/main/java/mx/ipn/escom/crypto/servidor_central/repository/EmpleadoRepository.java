@@ -5,4 +5,6 @@ import org.springframework.stereotype.Repository;
 
 // Repositorio para Empleados
 @Repository
-public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {}
+public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
+	Empleado findByNombreCompleto(String nombreCompleto);
+}

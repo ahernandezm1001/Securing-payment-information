@@ -13,8 +13,12 @@ public class Empleado {
     @Column(name = "id_empleado")
     private Long idEmpleado;
 
+
     @Column(name = "nombre_completo", nullable = false, length = 150)
     private String nombreCompleto;
+
+    @Column(name = "password", nullable = false, length = 100)
+    private String password;
 
     // Relación inversa para ver qué tickets ha generado este empleado
     @OneToMany(mappedBy = "empleado")
