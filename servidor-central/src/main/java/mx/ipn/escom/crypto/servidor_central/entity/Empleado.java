@@ -23,4 +23,7 @@ public class Empleado {
     // Relación inversa para ver qué tickets ha generado este empleado
     @OneToMany(mappedBy = "empleado")
     private List<Ticket> tickets;
+
+    @Column(nullable = false)
+    private String password;
 }

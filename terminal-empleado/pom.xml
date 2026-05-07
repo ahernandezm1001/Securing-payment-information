@@ -35,11 +35,15 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+<<<<<<< Updated upstream
 		<!-- Dependencia para Thymeleaf -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
+=======
+		
+>>>>>>> Stashed changes
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
