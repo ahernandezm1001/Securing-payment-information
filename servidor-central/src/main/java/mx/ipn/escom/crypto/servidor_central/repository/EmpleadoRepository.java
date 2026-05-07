@@ -5,12 +5,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EmpleadoRepository extends JpaRepository<Empleado, Long> {
-<<<<<<< Updated upstream
+
 	Empleado findByNombreCompleto(String nombreCompleto);
 }
-=======
-    
-    Empleado findByNombreCompleto(String nombreCompleto);
-    
-}
->>>>>>> Stashed changes

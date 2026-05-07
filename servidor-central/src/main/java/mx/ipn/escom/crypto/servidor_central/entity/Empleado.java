@@ -24,6 +24,4 @@ public class Empleado {
     @OneToMany(mappedBy = "empleado")
     private List<Ticket> tickets;
 
-    @Column(nullable = false)
-    private String password;
 }

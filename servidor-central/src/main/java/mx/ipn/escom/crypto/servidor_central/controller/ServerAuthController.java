@@ -56,7 +56,7 @@ public class ServerAuthController {
             String hashedRequestPassword = hashPassword(request.getPassword());
             
             //comparamos ese Hash contra el Hash que está guardado en la BD
-            if (empleadoDb.getPassword().equals(hashedRequestPassword)) {
+            if (empleadoDb.getPassword().equalsIgnoreCase(hashedRequestPassword)) {
                 response.put("success", true);
                 response.put("nombre", empleadoDb.getNombreCompleto());
                 return ResponseEntity.ok(response);
