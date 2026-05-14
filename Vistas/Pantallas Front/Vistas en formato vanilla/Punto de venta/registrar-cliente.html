@@ -1,0 +1,43 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar cliente nuevo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="modal-overlay" id="registrarModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Registrar cliente</h2>
+                <button class="modal-close" onclick="document.getElementById('registrarModal').style.display='none'">&times;</button>
+            </div>
+                
+            <div class="modal-body">
+                <h2 style="font-weight: bold; margin-bottom: 10px;">Datos del cliente</h2>
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="username" name="username" placeholder="Álvaro Hernández" required>
+                    <label for="numeroTelefoono">Número de teléfono</label>
+                    <input type="number" id="numeroTelefono" name="numeroTelefono" placeholder="55 1234 5678" required>
+                    <label for="cardNumber">Número de tarjeta</label>
+                    <input type="number" id="cardNumber" name="cardNumber" placeholder="1234 5678 9012 3456" required>
+                </div>
+
+                    <!-- Formulario a conectar con PaymentController (generando EncryptedPayloadDto) -->
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <button class="btn btn-primary" style="width: 100%; padding: 14px; ">
+                    Cifrar y Guardar información del cliente
+                    </button>
+                    <button class="btn btn-danger" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="document.getElementById('registrarModal').style.display='none'">
+                    Cancelar
+                    </button>
+                </div>                    
+            </div>
+            </div>
+        </div>
+        
+    </body> 
+</html>

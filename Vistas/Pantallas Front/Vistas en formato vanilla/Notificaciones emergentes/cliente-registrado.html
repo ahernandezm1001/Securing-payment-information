@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cliente registrado</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    
+  <!-- Modal de Error de Firma -->
+  <div class="modal-overlay" id="signatureErrorModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Cliente registrado</h2>
+        <button class="modal-close" onclick="document.getElementById('signatureErrorModal').style.display='none'">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        
+        <!-- Recuadro informativo rojo tenue (basado en total-display) -->
+        <div class="total-display" >
+          <p style="font-weight: bold; text-transform: uppercase; font-size: 0.9rem; margin: 0;">
+            Cliente registrado exitosamente
+          </p>
+        </div>
+
+        <!-- Botón de Aceptar -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <button class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem;" onclick="document.getElementById('signatureErrorModal').style.display='none'">
+            Aceptar
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>  
+</html>

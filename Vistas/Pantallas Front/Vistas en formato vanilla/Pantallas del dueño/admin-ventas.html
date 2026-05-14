@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de administración - Ventas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="main-header">
+    <div class="welcome-text">
+      Bienvenido Don Diego
+    </div>
+    <div class="header-actions">
+      <button class="btn" style="background-color: var(--brand-primary); color: var(--brand-dark);">Reportes mensuales</button>
+      <button class="btn" style="background-color: var(--brand-teal); color: white;">Ventas</button>
+    </div>
+  </header>
+
+  <div class="admin-layout">
+
+    <div class="admin-content">
+      
+      <div class="report-header">
+        <div>
+          <h1 style="color: var(--brand-dark); font-size: 1.8rem; margin-bottom: 8px;">Desglose de ventas de Ana Alcántara</h1>
+          <p style="color: var(--brand-teal); font-weight: bold; font-size: 1.1rem;">No. de tarjeta cifrado: 1234 5678 9012 3456</p>
+        </div>      
+      </div>
+  
+      <div class="sale-card">
+        <div class="sale-header">
+          <span style="font-weight: bold; color: var(--text-gray);">📅 Fecha: 15/03/2026 - 14:30 hrs</span>
+          <span style="font-weight: bold; color: var(--brand-teal);">Venta #001</span>
+        </div>
+        
+        <ul class="sale-products">
+          <li>
+            <span>1x Chamarra de Mezclilla</span>
+            <span>$850.00</span>
+          </li>
+          <li>
+            <span>2x Playeras Básicas Blancas</span>
+            <span>$400.00</span>
+          </li>
+        </ul>
+
+        <div class="sale-footer">
+          <div>
+            <p style="font-size: 0.85rem; color: var(--text-gray); font-weight: bold;">MÉTODO DE PAGO</p>
+            <p style="color: var(--brand-dark); font-family: monospace; font-size: 1.1rem;">💳 1234 5678 9012 3456</p>
+          </div>
+          <div style="text-align: right;">
+            <p style="font-size: 0.85rem; color: var(--text-gray); font-weight: bold;">TOTAL PAGADO</p>
+            <p style="font-size: 1.5rem; font-weight: bold; color: var(--brand-primary);">$1,250.00</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sale-card">
+        <div class="sale-header">
+          <span style="font-weight: bold; color: var(--text-gray);">📅 Fecha: 16/03/2026 - 10:15 hrs</span>
+          <span style="font-weight: bold; color: var(--brand-teal);">Venta #002</span>
+        </div>
+        
+        <ul class="sale-products">
+          <li>
+            <span>1x Pantalón de Vestir (Talla 32)</span>
+            <span>$650.00</span>
+          </li>
+        </ul>
+
+        <div class="sale-footer">
+          <div>
+            <p style="font-size: 0.85rem; color: var(--text-gray); font-weight: bold;">MÉTODO DE PAGO</p>
+            <p style="color: var(--brand-dark); font-family: monospace; font-size: 1.1rem;">💳 1234 5678 9012 3456</p>
+          </div>
+          <div style="text-align: right;">
+            <p style="font-size: 0.85rem; color: var(--text-gray); font-weight: bold;">TOTAL PAGADO</p>
+            <p style="font-size: 1.5rem; font-weight: bold; color: var(--brand-primary);">$650.00</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="admin-sidebar">
+      <h2 style="color: var(--brand-dark); margin-bottom: 20px;">Clientes registrados</h2>
+
+      <div class="report-card active">
+        <h3 style="color: var(--brand-dark);">Ana Alcántara</h3>
+        <p style="color: var(--text-gray); font-weight: bold; margin-top: 4px;">Tarjeta: 1234 5678 9012 3456</p>
+        
+        <div class="report-card-actions">
+          <button class="btn btn-primary" style="flex: 1; padding: 8px; font-size: 0.9rem;">
+            Ver detalles
+          </button>
+          <button class="btn btn-danger" style="flex: 1; padding: 8px; font-size: 0.9rem;">
+            Descartar
+          </button>
+        </div>
+      </div>
+
+      <div class="report-card">
+        <h3 style="color: var(--brand-dark);">Alejandro Martínez</h3>
+        <p style="color: var(--text-gray); font-weight: bold; margin-top: 4px;">Tarjeta: 9876 5432 1098 7654</p>
+        
+        <div class="report-card-actions">
+          <button class="btn btn-dark" style="flex: 1; padding: 8px; font-size: 0.9rem; background-color: var(--brand-teal);">
+            Ver detalles
+          </button>
+          <button class="btn btn-danger" style="flex: 1; padding: 8px; font-size: 0.9rem;">
+            Descartar
+          </button>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+</body>
+</html>

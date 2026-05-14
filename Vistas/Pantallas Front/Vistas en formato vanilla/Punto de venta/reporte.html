@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar reporte mensual</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    
+    <div class="modal-overlay" id="reportModal">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h2>Generar reporte mensual</h2>
+                <button class="modal-close" onclick="document.getElementById('reportModal').style.display='none'">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                            
+                <div class="form-group">
+                    <label for="mesReporte">Seleccione el mes (año actual):</label>
+                    <input 
+                        type="month" 
+                        id="mesReporte" 
+                        name="mesReporte" 
+                        min="2026-01" 
+                        max="2026-12" 
+                        required
+                        style="font-size: 1.1rem; padding: 14px; text-align: center; cursor: pointer;"
+                    >
+                </div>
+
+                <p style="font-size: 0.9rem; color: var(--text-gray); margin-bottom: 20px; text-align: center;">
+                    El reporte se firmará digitalmente al ser generado.
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <button class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem;">
+                        Generar y Firmar reporte
+                    </button>
+                    
+                    <button class="btn btn-danger" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="document.getElementById('reportModal').style.display='none'">
+                        Cancelar
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,455 @@
+/* Estilos para el sistema */
+:root {
+  /* Paleta de colores */
+  --brand-dark: #22577a;
+  --brand-teal: #38a3a5;
+  --brand-primary: #57cc99;
+  --brand-accent: #80ed99;
+  --brand-light: #c7f9cc;
+  
+  /* Colores neutros */
+  --bg-gray: #f9fafb;
+  --text-gray: #6b7280;
+  --white: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+body {
+  background-color: var(--bg-gray);
+  color: var(--brand-dark);
+}
+
+
+/* --- Clases de Utilidad --- */
+.btn {
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background-color: var(--brand-primary);
+  color: var(--white);
+}
+.btn-primary:hover {
+  background-color: var(--brand-accent);
+  color: var(--brand-dark);
+}
+
+.btn-dark {
+  background-color: var(--brand-dark);
+  color: var(--white);
+}
+.btn-dark:hover {
+  background-color: var(--brand-teal);
+}
+
+
+/* --- Estilos Botón Cancelar/Peligro --- */
+.btn-danger {
+  /* Un rojo suave/ladrillo que no lastima la vista y combina con fondos claros */
+  background-color: #e07a5f; 
+  color: var(--white);
+  border: 1px solid #d06a4f;
+}
+
+.btn-danger:hover {
+  background-color: #d06a4f;
+  color: var(--white);
+}
+
+
+/* --- Estilos Login --- */
+.login-body {
+  background-color: var(--brand-dark);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.login-card {
+  background-color: var(--brand-light);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  width: 100%;
+  max-width: 400px;
+  border-top: 5px solid var(--brand-primary);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.icon-circle {
+  width: 60px;
+  height: 60px;
+  background-color: var(--brand-teal);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+  color: var(--white);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--brand-teal);
+  border-radius: 8px;
+  outline: none;
+}
+.form-group input:focus {
+  border-color: var(--brand-dark);
+}
+
+
+/* --- Estilos POS (Punto de Venta) --- */
+.pos-layout {
+  display: flex;
+  height: 100vh;
+}
+
+.pos-catalog {
+  width: 70%;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.pos-bottom-buttons {
+  display: flex;
+  gap: 170px;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.pos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.product-card {
+  background: var(--white);
+  border: 1px solid var(--brand-light);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.product-img {
+  height: 120px;
+  background-color: var(--brand-light);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-dark);
+}
+
+.product-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.pos-ticket {
+  width: 30%;
+  background-color: var(--brand-light);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+}
+
+.ticket-items {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 16px;
+}
+
+.ticket-item {
+  background: var(--white);
+  padding: 12px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.ticket-total {
+  border-top: 2px solid var(--brand-teal);
+  padding-top: 16px;
+  margin-top: 16px;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.btn-checkout {
+  width: 100%;
+  padding: 16px;
+  font-size: 1.2rem;
+}
+
+
+/* --- Estilos Modal de Pago Seguro --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(34, 87, 122, 0.8); /* --brand-dark con opacidad */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  /* display: none; Quitar el comentario a esta línea para ocultarlo por defecto */
+}
+
+.modal-content {
+  background: var(--white);
+  width: 100%;
+  max-width: 400px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+  background: var(--brand-dark);
+  color: var(--white);
+  padding: 16px;
+  text-align: center;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  background: none;
+  border: none;
+  color: var(--brand-light);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.total-display {
+  background: var(--brand-light);
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 20px;
+  border: 1px solid var(--brand-teal);
+}
+
+.total-display h3 {
+  font-size: 2.5rem;
+  color: var(--brand-teal);
+  margin-top: 5px;
+}
+
+.payment-methods {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.method-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: var(--white);
+  font-weight: bold;
+  color: var(--text-gray);
+  cursor: pointer;
+}
+
+.method-btn.active {
+  border-color: var(--brand-teal);
+  background: var(--brand-light);
+  color: var(--brand-dark);
+}
+
+.method-btn:hover:not(.active) {
+  border-color: var(--brand-teal);
+  color: var(--brand-teal);
+}
+
+
+/* --- Estilos Panel de Administración (Dueño) --- */
+.admin-layout {
+  display: flex;
+  height: 100vh;
+}
+
+/* Sección 1: Lista de Reportes */
+.admin-sidebar {
+  width: 30%;
+  background-color: var(--brand-light);
+  padding: 24px;
+  overflow-y: auto;
+  border-right: 2px solid var(--brand-teal);
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+  z-index: 10;
+}
+
+.report-card {
+  background: var(--white);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  border-left: 5px solid var(--brand-teal);
+  transition: transform 0.2s ease;
+}
+
+.report-card.active {
+  border-left-color: var(--brand-primary);
+  border-left-width: 8px;
+}
+
+.report-card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+/* Sección 2: Detalle del Reporte */
+.admin-content {
+  width: 70%;
+  padding: 32px;
+  overflow-y: auto;
+  background-color: var(--bg-gray);
+}
+
+.report-header {
+  background: var(--white);
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 4px solid var(--brand-dark);
+}
+
+.sale-card {
+  background: var(--white);
+  border: 1px solid var(--brand-light);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.sale-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--brand-light);
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+
+.sale-products {
+  list-style-type: none;
+  padding: 0;
+  margin-bottom: 12px;
+}
+
+.sale-products li {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  color: var(--brand-dark);
+  font-size: 0.95rem;
+}
+
+.sale-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--bg-gray);
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+
+/* --- Estilos del Header Superior --- */
+.main-header {
+  background-color: var(--brand-dark);
+  color: var(--white);
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  height: 70px;
+}
+
+.welcome-text {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.header-actions {
+  display: flex;
+  gap: 15px;
+}
+
+/* Ajuste para que el layout empiece debajo del header */
+.admin-layout {
+  display: flex;
+  height: calc(100vh - 70px); /* Restamos la altura del header */
+}

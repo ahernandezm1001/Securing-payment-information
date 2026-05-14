@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Terminal - Ventas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="pos-layout">
+
+    <!-- SECCIÓN IZQUIERDA: CATÁLOGO -->
+    <div class="pos-catalog">
+      <header class="pos-header">
+        <h1 style="color: var(--brand-dark);">Terminal para ventas</h1>
+        <div style="color: var(--brand-teal); font-weight: bold;">Empleado: Juan Pérez</div>
+      </header>
+
+      <div class="product-grid">
+        <!-- Tarjeta Producto 1 -->
+        <div class="product-card">
+          <div class="product-img">[Foto Chamarra]</div>
+          <h3>Chamarra Mezclilla</h3>
+          <p style="color: var(--text-gray); font-size: 0.9rem;">Talla: M</p>
+          <div class="product-info">
+            <span style="color: var(--brand-teal); font-weight: bold;">$850.00</span>
+            <button class="btn btn-dark" style="padding: 6px 12px; font-size: 0.9rem;">+ Agregar</button>
+          </div>
+        </div>
+        
+        <!-- Tarjeta Producto 2 -->
+        <div class="product-card">
+          <div class="product-img">[Foto Camiseta]</div>
+          <h3>Camiseta Básica</h3>
+          <p style="color: var(--text-gray); font-size: 0.9rem;">Talla: L</p>
+          <div class="product-info">
+            <span style="color: var(--brand-teal); font-weight: bold;">$250.00</span>
+            <button class="btn btn-dark" style="padding: 6px 12px; font-size: 0.9rem;">+ Agregar</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SECCIÓN DE BOTONES INFERIORES -->
+      <div class="pos-bottom-buttons">
+        <button class="btn btn-dark">Generar reporte mensual</button>
+        <button class="btn btn-dark">Registrar cliente nuevo</button>
+      </div>
+    </div>
+
+    <!-- SECCIÓN DERECHA: TICKET -->
+    <div class="pos-ticket">
+      <div class="pos-bottom-buttons" style="gap: 140px;">
+        <h2>Ticket actual</h2>
+        <button class="btn btn-danger">Vaciar ticket</button>
+      </div>
+      
+      <!-- Detalle de Ticket -->
+      <div class="ticket-items">
+        <div class="ticket-item">
+          <div>
+            <div style="font-weight: bold;">Chamarra Mezclilla</div>
+            <div style="color: var(--text-gray); font-size: 0.8rem;">1 x $850.00</div>
+          </div>
+          <div style="color: var(--brand-teal); font-weight: bold;">$850.00</div>
+        </div>
+      </div>
+
+      <!-- Resumen y Acción -->
+      <div class="ticket-total">
+        <div class="total-row">
+          <span>Total:</span>
+          <span>$850.00</span>
+        </div>
+        <!-- Este botón abriría el modal mediante JavaScript -->
+        <button class="btn btn-primary btn-checkout">Procesar pago seguro</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

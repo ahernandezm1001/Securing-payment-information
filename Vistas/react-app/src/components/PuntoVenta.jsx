@@ -1,67 +1,121 @@
-export default function PuntoVenta({ products, ticketItems, total, onAddProduct, onProcessPayment, username }) {
+import React from 'react';
+
+export default function TerminalVentas({ 
+  products = [], 
+  ticketItems = [], 
+  total = 0, 
+  username = 'Juan Pérez',
+  onAddProduct,
+  onEmptyTicket,
+  onProcessPayment,
+  onGenerateReport,
+  onRegisterClient
+}) {
   return (
     <div className="flex h-screen bg-gray-50 font-sans">
-      <div className="w-2/3 p-6 overflow-y-auto">
-        <header className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-brand-dark">Terminal POS - Ropa</h1>
-          <div className="text-brand-teal font-semibold">Empleado: {username}</div>
+      
+      {/* SECCIÓN IZQUIERDA: CATÁLOGO */}
+      <div className="w-2/3 p-6 flex flex-col h-full">
+        
+        <header className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-brand-dark">Terminal para ventas</h1>
+          <div className="text-brand-teal font-bold border-b-2 border-brand-teal pb-1">
+            Empleado: {username}
+          </div>
         </header>
 
-        <div className="grid grid-cols-3 gap-6">
+        {/* Grid de Productos (con scroll independiente) */}
+        <div className="grid grid-cols-3 gap-6 overflow-y-auto flex-1 pr-2 pb-4 cursor-default">
           {products.map((product) => (
-            <div key={product.id} className="bg-white rounded-xl shadow-sm border border-brand-light p-4 hover:shadow-md transition">
-              <div className="h-32 bg-brand-light rounded-lg mb-4 flex items-center justify-center text-brand-dark">
-                {product.name}
+            <div key={product.id} className="bg-white rounded-xl shadow-sm border border-brand-light p-4 hover:shadow-md transition flex flex-col">
+              <div className="h-32 bg-brand-light rounded-lg mb-4 flex items-center justify-center text-brand-dark text-sm font-medium border border-gray-200">
+                {product.imagePlaceholder || '[Foto Producto]'}
               </div>
-              <h3 className="font-bold text-brand-dark">{product.name}</h3>
-              <p className="text-sm text-gray-500 mb-4">Talla: {product.size}</p>
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-brand-teal">${product.price.toFixed(2)}</span>
+              <h3 className="font-bold text-brand-dark text-lg">{product.name}</h3>
+              <p className="text-sm text-gray-500 mb-4 flex-1">Talla: {product.size}</p>
+              
+              <div className="flex justify-between items-center mt-auto">
+                <span className="font-bold text-brand-teal text-lg">
+                  ${product.price.toFixed(2)}
+                </span>
                 <button
                   type="button"
                   onClick={() => onAddProduct(product)}
-                  className="bg-brand-dark text-white px-3 py-1 rounded hover:bg-brand-teal transition"
+                  className="bg-brand-dark text-white px-4 py-2 rounded-lg hover:bg-brand-teal transition shadow-sm text-sm font-semibold"
                 >
                   + Agregar
                 </button>
               </div>
             </div>
           ))}
+          
+          {/* Tarjeta de estado vacío si no hay productos */}
+          {products.length === 0 && (
+            <div className="col-span-3 flex items-center justify-center h-40 text-gray-400 font-medium">
+              No hay productos disponibles en el catálogo.
+            </div>
+          )}
+        </div>
+
+        {/* SECCIÓN DE BOTONES INFERIORES */}
+        <div className="pt-4 mt-2 border-t-2 border-gray-200 flex gap-4">
+          <button 
+            onClick={onGenerateReport}
+            className="bg-brand-dark text-white font-bold py-3 px-6 rounded-xl hover:bg-brand-teal transition shadow-md flex-1"
+          >
+            Generar reporte mensual
+          </button>
+          <button 
+            onClick={onRegisterClient}
+            className="bg-white text-brand-dark border-2 border-brand-dark font-bold py-3 px-6 rounded-xl hover:bg-brand-dark hover:text-white transition shadow-md flex-1"
+          >
+            Registrar cliente nuevo
+          </button>
         </div>
       </div>
 
-      <div className="w-1/3 bg-brand-light p-6 shadow-l flex flex-col">
+      {/* SECCIÓN DERECHA: TICKET */}
+      <div className="w-1/3 bg-brand-light p-6 shadow-2xl flex flex-col border-l border-gray-200">
+        
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-brand-dark">Ticket Actual</h2>
+          <h2 className="text-2xl font-bold text-brand-dark">Ticket actual</h2>
           <button
             type="button"
-            onClick={() => window.location.reload()}
-            className="text-sm text-brand-dark underline hover:text-brand-teal"
+            onClick={onEmptyTicket}
+            disabled={ticketItems.length === 0}
+            className="text-sm font-semibold text-red-500 hover:text-red-700 hover:underline disabled:opacity-50 disabled:no-underline transition"
           >
-            Reiniciar
+            Vaciar ticket
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        {/* Detalle de Ticket */}
+        <div className="flex-1 overflow-y-auto pr-2">
           {ticketItems.length === 0 ? (
-            <div className="bg-white rounded-xl p-6 text-center text-gray-500">
+            <div className="bg-white rounded-xl p-8 text-center text-gray-500 border border-dashed border-gray-300">
+              <svg className="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
               Agrega productos para ver el ticket.
             </div>
           ) : (
             ticketItems.map((item) => (
-              <div key={item.id} className="flex justify-between items-center bg-white p-3 rounded-lg mb-2 shadow-sm">
+              <div key={item.id} className="flex justify-between items-center bg-white p-4 rounded-xl mb-3 shadow-sm border border-gray-100">
                 <div>
-                  <p className="font-semibold text-brand-dark">{item.name}</p>
-                  <p className="text-xs text-gray-500">{item.quantity} x ${item.price.toFixed(2)}</p>
+                  <div className="font-bold text-brand-dark">{item.name}</div>
+                  <div className="text-sm text-gray-500 mt-1">{item.quantity} x ${item.price.toFixed(2)}</div>
                 </div>
-                <span className="text-brand-teal font-bold">${(item.price * item.quantity).toFixed(2)}</span>
+                <div className="text-brand-teal font-black text-lg">
+                  ${(item.price * item.quantity).toFixed(2)}
+                </div>
               </div>
             ))
           )}
         </div>
 
-        <div className="mt-4 pt-4 border-t-2 border-brand-teal">
-          <div className="flex justify-between text-xl font-bold text-brand-dark mb-6">
+        {/* Resumen y Acción */}
+        <div className="mt-4 pt-6 border-t-2 border-brand-teal bg-brand-light">
+          <div className="flex justify-between text-2xl font-black text-brand-dark mb-6 px-2">
             <span>Total:</span>
             <span>${total.toFixed(2)}</span>
           </div>
@@ -69,11 +123,15 @@ export default function PuntoVenta({ products, ticketItems, total, onAddProduct,
             type="button"
             onClick={onProcessPayment}
             disabled={total === 0}
-            className="w-full bg-brand-primary text-white text-xl font-bold py-4 rounded-xl hover:bg-brand-accent hover:text-brand-dark transition duration-300 shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+            className="w-full bg-brand-primary text-white text-xl font-bold py-4 rounded-xl hover:bg-brand-accent hover:text-brand-dark transition duration-300 shadow-lg disabled:cursor-not-allowed disabled:opacity-60 flex justify-center items-center gap-2"
           >
-            Procesar Pago Seguro
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Procesar pago seguro
           </button>
         </div>
+        
       </div>
     </div>
   );
