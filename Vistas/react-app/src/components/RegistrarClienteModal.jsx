@@ -85,7 +85,7 @@ export default function ModalRegistrarCliente({ isOpen = false, onClose, onSave 
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border-2 border-brand-teal focus:outline-none focus:border-brand-dark bg-white transition"
-                placeholder="Ej. Álvaro Hernández"
+                placeholder="Ej. Juan Pérez"
                 disabled={isProcessing}
                 required
               />

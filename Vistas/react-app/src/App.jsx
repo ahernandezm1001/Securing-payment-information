@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { apiClient } from './services/api';
 
 // --- IMPORTACIÓN DE COMPONENTES ---
@@ -12,14 +12,10 @@ import AdminReportes from './components/AdminReportes';
 import AdminVentas from './components/AdminVentas';
 import ModalIdentificarCliente from './components/ModalIdentificarCliente';
 
-// Catálogo de productos de ejemplo
-const products = [
-  { id: 1, name: 'Chamarra de Mezclilla', price: 850, size: 'M' },
-  { id: 2, name: 'Playera Básica', price: 320, size: 'L' },
-  { id: 3, name: 'Pantalón Casual', price: 670, size: '32' }
-];
-
 export default function App() {
+  // ✅ ESTADO DE PRODUCTOS (Ahora sí, adentro de la función principal)
+  const [products, setProducts] = useState([]);
+
   // --- ESTADOS DE NAVEGACIÓN ---
   const [page, setPage] = useState('login'); // 'login', 'pos', 'admin-reportes', 'admin-ventas'
   const [username, setUsername] = useState('');
@@ -58,11 +54,42 @@ export default function App() {
       setPage('pos');
     }
   };
+ 
+  // --- MANEJO DE PRODUCTOS --- 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await apiClient.getProducts();
+        setProducts(data); 
+      } catch (error) {
+        console.error("Error cargando productos:", error);
+      }
+    };
 
+    fetchProducts();
+  }, []);
+
+  
   // --- MANEJO DEL CARRITO ---
   const handleAddProduct = (product) => {
     setTicketItems((current) => {
       const existing = current.find((item) => item.id === product.id);
+      
+      // Calculamos cuántos tiene el empleado actualmente en el ticket
+      const cantidadEnTicket = existing ? existing.quantity : 0;
+
+      // Verificamos si al agregar uno más se supera el stock disponible
+      if (cantidadEnTicket >= product.stock) {
+        setNotificacion({
+          isOpen: true, 
+          tipo: 'error', 
+          titulo: 'Stock insuficiente', 
+          mensaje: `Solo hay ${product.stock} unidades de "${product.name}" disponibles.`
+        });
+        return current; // Retorna el carrito sin cambios
+      }
+
+      // Si sí hay stock, lo agregamos normalmente
       if (existing) {
         return current.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item

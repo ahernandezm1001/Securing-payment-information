@@ -26,24 +26,37 @@ export default function TerminalVentas({
 
         {/* Grid de Productos (con scroll independiente) */}
         <div className="grid grid-cols-3 gap-6 overflow-y-auto flex-1 pr-2 pb-4 cursor-default">
-          {products.map((product) => (
-            <div key={product.id} className="bg-white rounded-xl shadow-sm border border-brand-light p-4 hover:shadow-md transition flex flex-col">
+          {products.map((product, index) => (
+            <div key={product.id || product.idProducto || index} className="bg-white rounded-xl shadow-sm border border-brand-light p-4 hover:shadow-md transition flex flex-col">
+              
               <div className="h-32 bg-brand-light rounded-lg mb-4 flex items-center justify-center text-brand-dark text-sm font-medium border border-gray-200">
                 {product.imagePlaceholder || '[Foto Producto]'}
               </div>
               <h3 className="font-bold text-brand-dark text-lg">{product.name}</h3>
               <p className="text-sm text-gray-500 mb-4 flex-1">Talla: {product.size}</p>
-              
+
               <div className="flex justify-between items-center mt-auto">
-                <span className="font-bold text-brand-teal text-lg">
-                  ${product.price.toFixed(2)}
-                </span>
+                <div className="flex flex-col">
+                  <span className="font-bold text-brand-teal text-lg leading-none">
+                    ${product.price.toFixed(2)}
+                  </span>
+                  {/* Etiqueta pequeñita que dice cuántos quedan */}
+                  <span className="text-[11px] font-bold text-gray-400 mt-1">
+                    Disponibles: {product.stock}
+                  </span>
+                </div>
+                
                 <button
                   type="button"
                   onClick={() => onAddProduct(product)}
-                  className="bg-brand-dark text-white px-4 py-2 rounded-lg hover:bg-brand-teal transition shadow-sm text-sm font-semibold"
+                  disabled={product.stock === 0} // ¡Se bloquea si es 0!
+                  className={`px-4 py-2 rounded-lg transition shadow-sm text-sm font-semibold ${
+                    product.stock === 0
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed' // Estilo apagado
+                      : 'bg-brand-dark text-white hover:bg-brand-teal' // Estilo normal
+                  }`}
                 >
-                  + Agregar
+                  {product.stock === 0 ? 'Agotado' : '+ Agregar'}
                 </button>
               </div>
             </div>
@@ -99,8 +112,8 @@ export default function TerminalVentas({
               Agrega productos para ver el ticket.
             </div>
           ) : (
-            ticketItems.map((item) => (
-              <div key={item.id} className="flex justify-between items-center bg-white p-4 rounded-xl mb-3 shadow-sm border border-gray-100">
+            ticketItems.map((item, index) => (
+              <div key={item.id || item.idProducto || index} className="flex justify-between items-center bg-white p-4 rounded-xl mb-3 shadow-sm border border-gray-100">
                 <div>
                   <div className="font-bold text-brand-dark">{item.name}</div>
                   <div className="text-sm text-gray-500 mt-1">{item.quantity} x ${item.price.toFixed(2)}</div>

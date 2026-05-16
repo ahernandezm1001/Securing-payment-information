@@ -33,9 +33,7 @@ export const apiClient = {
     return data;
   },
 
-  // --- NUEVOS ENDPOINTS ---
 
-  // Agrega esto dentro de tu objeto/clase apiClient en api.js
   async registerClient(clientData) {
     const response = await fetch(`http://localhost:8081/api/clientes/registrar`, {
       method: 'POST',
@@ -51,13 +49,11 @@ export const apiClient = {
     
     return await response.json();
   },
-  // Añadir esto a tu objeto apiClient en api.js
-  // En src/services/api.js
+  
   async searchClient(phone) {
     const response = await fetch(`http://localhost:8081/api/clientes/buscar?telefono=${phone}`);
     
-    // 1. LA CLAVE: Si el backend dice 404, devolvemos 'null' explícitamente.
-    // Esto es lo que activa el modal de "Registrar Cliente" en tu App.jsx
+    
     if (response.status === 404) {
       return null; 
     }
@@ -82,5 +78,14 @@ export const apiClient = {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Error al generar reporte');
     return data;
+  },
+
+  
+  async getProducts() {
+    const response = await fetch(`http://localhost:8081/api/productos`);
+    if (!response.ok) {
+      throw new Error('Error al cargar el catálogo de productos');
+    }
+    return await response.json();
   }
 };
