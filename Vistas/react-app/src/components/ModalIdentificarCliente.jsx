@@ -16,11 +16,10 @@ export default function ModalIdentificarCliente({ isOpen, onClose, onClientFound
       const cliente = await apiClient.searchClient(phone);
       
       // Verificamos si la respuesta tiene un 'nombre'. 
-      // Si solo trae un "message" de error, o viene vacía (null), lo mandamos a registrar.
       if (cliente && cliente.nombre) {
-        onClientFound(cliente); // ¡Es un cliente real! Vamos a cobrar.
+        onClientFound(cliente);
       } else {
-        onRegisterNew(phone); // ¡No existe! Vamos a registrarlo.
+        onRegisterNew(phone); 
       }
       
     } catch (err) {

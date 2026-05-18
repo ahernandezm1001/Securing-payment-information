@@ -37,16 +37,19 @@ public class LoginController {
 
             // 2. Si el servidor responde exitosamente
             if (serverResponse.getStatusCode().is2xxSuccessful()) {
-                String nombreEmpleado = (String) serverResponse.getBody().get("nombre");
+                    String nombreEmpleado = (String) serverResponse.getBody().get("nombre");
+                    Object idObj = serverResponse.getBody().get("id");
 
-                handshakeService.performHandshake(); 
-                System.out.println("✓ Handshake completado y llave AES generada.");
+                    handshakeService.performHandshake(); 
+                    System.out.println("✓ Handshake completado y llave AES generada.");
                 
-                response.put("success", true);
-                response.put("message", "Login exitoso.");
-                response.put("nombre", nombreEmpleado);
+                    response.put("success", true);
+                    response.put("message", "Login exitoso.");
+                    response.put("nombre", nombreEmpleado);
+                    // Pasamos también el id del empleado recibido desde el servidor central
+                    if (idObj != null) response.put("id", idObj);
                 
-                return ResponseEntity.ok(response);
+                    return ResponseEntity.ok(response);
             }
             
         } catch (Exception e) {

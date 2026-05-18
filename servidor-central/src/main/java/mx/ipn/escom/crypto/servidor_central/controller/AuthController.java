@@ -1,3 +1,4 @@
+/*
 package mx.ipn.escom.crypto.servidor_central.controller;
 
 import mx.ipn.escom.crypto.servidor_central.entity.Empleado;
@@ -27,3 +28,4 @@ public class AuthController {
         }
     }
 }
+*/

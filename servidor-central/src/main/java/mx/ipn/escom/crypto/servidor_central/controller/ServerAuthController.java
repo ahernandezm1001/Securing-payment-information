@@ -1,6 +1,5 @@
 package mx.ipn.escom.crypto.servidor_central.controller;
 
-import mx.ipn.escom.crypto.servidor_central.dto.LoginRequest;
 import mx.ipn.escom.crypto.servidor_central.repository.EmpleadoRepository;
 import mx.ipn.escom.crypto.servidor_central.entity.Empleado;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ public class ServerAuthController {
     @Autowired
     private EmpleadoRepository empleadoRepository;
 
-    // Método auxiliar privado para hashear dentro del controlador
     private String hashPassword(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -36,31 +34,54 @@ public class ServerAuthController {
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<Map<String, Object>> validateCredentials(@RequestBody LoginRequest request) {
+    public ResponseEntity<Map<String, Object>> validateCredentials(@RequestBody Map<String, String> payload) {
+        // 1. Extraemos directamente para que NO se pierdan los datos
+        String reqUsername = payload.get("username");
+        String reqPassword = payload.get("password");
+        
+        System.out.println("LLEGÓ AL 8080 -> Intentando loguear a: '" + reqUsername + "'");
+
         Map<String, Object> response = new HashMap<>();
 
-        // Validar el backdoor del admin
-        if ("admin".equals(request.getUsername()) && "admin123".equals(request.getPassword())) {
+        // 2. Validar el backdoor del admin
+        if ("admin".equals(reqUsername) && "admin123".equals(reqPassword)) {
+            System.out.println("✅ Login exitoso: Entró el Administrador (Backdoor)");
+            // Intentamos recuperar un empleado 'Administrador' en la BD
+            Empleado admin = empleadoRepository.findByNombreCompleto("Administrador");
+            if (admin == null) {
+                // Si no existe, lo creamos con la contraseña hasheada
+                admin = new Empleado();
+                admin.setNombreCompleto("Administrador");
+                admin.setPassword(hashPassword("admin123"));
+                admin = empleadoRepository.save(admin);
+                System.out.println("Administrador creado en BD con ID: " + admin.getIdEmpleado());
+            }
             response.put("success", true);
-            response.put("nombre", "Administrador");
+            response.put("nombre", admin.getNombreCompleto());
+            response.put("id", admin.getIdEmpleado());
             return ResponseEntity.ok(response);
         }
 
-        // 2. Buscar en PostgreSQL usando el Nombre Completo
-        Empleado empleadoDb = empleadoRepository.findByNombreCompleto(request.getUsername());
+        // 3. Buscar en PostgreSQL
+        Empleado empleadoDb = empleadoRepository.findByNombreCompleto(reqUsername);
 
-        // 3. Validar si el empleado existe
         if (empleadoDb != null) {
+            System.out.println("Usuario encontrado en BD. Hasheando contraseña para comparar...");
+            String hashedRequestPassword = hashPassword(reqPassword);
             
-            // Hasheamos 
-            String hashedRequestPassword = hashPassword(request.getPassword());
-            
-            //comparamos ese Hash contra el Hash que está guardado en la BD
+            // 4. Validar contraseña hasheada
             if (empleadoDb.getPassword().equalsIgnoreCase(hashedRequestPassword)) {
+                System.out.println("✅ Login exitoso: Contraseña correcta");
                 response.put("success", true);
                 response.put("nombre", empleadoDb.getNombreCompleto());
+                response.put("id", empleadoDb.getIdEmpleado());
                 return ResponseEntity.ok(response);
+            } else {
+                // PARA DEBUG: Te imprimo por qué falló si es que falla
+                System.out.println("❌ Falló el hash. BD tiene: '" + empleadoDb.getPassword() + "' pero tú mandaste el hash: '" + hashedRequestPassword + "'");
             }
+        } else {
+            System.out.println("❌ El usuario '" + reqUsername + "' no existe en la BD.");
         }
 
         // Credenciales incorrectas

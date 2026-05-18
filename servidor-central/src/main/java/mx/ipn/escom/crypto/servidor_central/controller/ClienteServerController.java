@@ -2,6 +2,8 @@ package mx.ipn.escom.crypto.servidor_central.controller;
 
 import mx.ipn.escom.crypto.servidor_central.entity.Cliente;
 import mx.ipn.escom.crypto.servidor_central.repository.ClienteRepository;
+import mx.ipn.escom.crypto.servidor_central.service.FpeService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,9 @@ public class ClienteServerController {
 
     @Autowired
     private ClienteRepository clienteRepository;
+
+    @Autowired
+    private FpeService fpeService;
 
     @GetMapping("/buscar")
     public ResponseEntity<Map<String, Object>> buscarCliente(@RequestParam String telefono) {
@@ -46,12 +51,13 @@ public class ClienteServerController {
     public ResponseEntity<Map<String, Object>> registrarCliente(@RequestBody Map<String, Object> request) {
         try {
             Cliente nuevoCliente = new Cliente();
+            String encryptedCard = fpeService.encrypt(((String) request.get("numeroTarjeta")).replace(" ", ""));
             
             // USAMOS LOS SETTERS DE LOMBOK CORRECTOS
             nuevoCliente.setNombreCompleto((String) request.get("nombre")); 
             nuevoCliente.setTelefono((String) request.get("numeroTelefono"));
-            String tarjetaLimpia = ((String) request.get("numeroTarjeta")).replace(" ", "");
-nuevoCliente.setNoTarjeta(tarjetaLimpia);
+            
+            nuevoCliente.setNoTarjeta(encryptedCard);
 
             Cliente clienteGuardado = clienteRepository.save(nuevoCliente);
 

@@ -5,15 +5,22 @@ export const apiClient = {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password, deviceId })
+      
+      body: JSON.stringify({ 
+        username: username,
+        password: password,
+        deviceId: deviceId
+      })
     });
     
     const data = await response.json();
     
-    if (!response.ok) {
+    // Validamos el campo "success" que nos manda el LoginController de Java
+    if (!response.ok || !data.success) {
       throw new Error(data.message || data.error || 'Error en login');
     }
     
+    // Devolvemos la data completa (que ahora incluye el id real y el nombre)
     return data;
   },
 
@@ -87,5 +94,38 @@ export const apiClient = {
       throw new Error('Error al cargar el catálogo de productos');
     }
     return await response.json();
+  },
+  async getVentasPorMes(anio, mesNombre, idEmpleado) {
+    const mesesMap = {
+      "Enero": 1, "Febrero": 2, "Marzo": 3, "Abril": 4, "Mayo": 5, "Junio": 6,
+      "Julio": 7, "Agosto": 8, "Septiembre": 9, "Octubre": 10, "Noviembre": 11, "Diciembre": 12
+    };
+    const numeroMes = mesesMap[mesNombre];
+    
+    // Le pegamos el idEmpleado a la URL
+    const response = await fetch(`http://localhost:8081/api/reportes/ventas?anio=${anio}&mes=${numeroMes}&idEmpleado=${idEmpleado}`);
+    
+    if (!response.ok) {
+      throw new Error('Error al cargar las ventas del mes');
+    }
+    return await response.json();
+  },
+  async firmarYEnviarReporte(datosFirma) {
+    const response = await fetch('http://localhost:8081/api/reportes/firmar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(datosFirma),
+    });
+
+    if (!response.ok) {
+      // Si Java nos mandó un error (ej. llave inválida), lo leemos
+      const errorText = await response.text();
+      throw new Error(errorText || 'Error al firmar y enviar el reporte');
+    }
+    
+    // Retornamos el mensaje de éxito del servidor
+    return await response.text();
   }
 };

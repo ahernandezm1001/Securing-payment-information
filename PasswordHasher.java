@@ -27,7 +27,7 @@ public class PasswordHasher {
 
     // Ejecuta este main para generar tus contraseñas de prueba
     public static void main(String[] args) {
-        String miPassword = "1"; // Pon aquí la contraseña que quieras
+        String miPassword = "admin123"; // Pon aquí la contraseña que quieras
         
         System.out.println("Contraseña en claro: " + miPassword);
         System.out.println("Copia este Hash y pégalo en tu Base de Datos:");

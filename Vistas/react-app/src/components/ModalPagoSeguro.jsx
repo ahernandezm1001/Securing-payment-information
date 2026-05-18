@@ -6,15 +6,15 @@ export default function ModalPagoSeguro({
   onClose, 
   total = 0, 
   ticketItems = [], 
-  username = '',     // Nombre del empleado
-  cliente = null,    // Datos del cliente identificado (nombre, telefono, etc.)
+  username = '',     
+  idEmpleado = null, // 👈 LO RECIBIMOS AQUÍ
+  cliente = null,    
   cardNumber = '', 
   onCardNumberChange = () => {} 
 }) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
-
 
   const procesarPago = async () => {
     if (!cardNumber.trim() || cardNumber.length < 15) {
@@ -28,7 +28,7 @@ export default function ModalPagoSeguro({
     try {
       const ticketData = {
         idCliente: cliente ? cliente.id : 1,
-        idEmpleado: 1, 
+        idEmpleado: idEmpleado, 
         noTarjetaPago: cardNumber,
         montoTotal: total,
         detalles: ticketItems.map((item) => ({
@@ -88,7 +88,7 @@ export default function ModalPagoSeguro({
               </button>
             </div>
           ) : (
-            /* VISTA DE FORMULARIO DE PAGO (Estilo HTML clásico) */
+            /* VISTA DE FORMULARIO DE PAGO */
             <div className="space-y-6">
               
               {/* Total a Cobrar */}

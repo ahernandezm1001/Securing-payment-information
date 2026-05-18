@@ -12,8 +12,8 @@ export default function LoginPantalla({ onLogin }) {
     setError('');
     setLoading(true);
     try {
-      await apiClient.login(username, password);
-      onLogin(username);
+      const datos = await apiClient.login(username, password);
+      onLogin(datos);
     } catch (err) {
       setError(err.message || 'Error al conectar con el servidor');
     } finally {

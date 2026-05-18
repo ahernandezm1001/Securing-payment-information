@@ -13,12 +13,13 @@ import AdminVentas from './components/AdminVentas';
 import ModalIdentificarCliente from './components/ModalIdentificarCliente';
 
 export default function App() {
-  // ✅ ESTADO DE PRODUCTOS (Ahora sí, adentro de la función principal)
+  // ✅ ESTADO DE PRODUCTOS 
   const [products, setProducts] = useState([]);
 
-  // --- ESTADOS DE NAVEGACIÓN ---
-  const [page, setPage] = useState('login'); // 'login', 'pos', 'admin-reportes', 'admin-ventas'
+  // --- ESTADOS DE NAVEGACIÓN Y USUARIO ---
+  const [page, setPage] = useState('login'); 
   const [username, setUsername] = useState('');
+  const [idEmpleado, setIdEmpleado] = useState(null); 
   
   // --- ESTADOS DEL CARRITO / TICKET ---
   const [ticketItems, setTicketItems] = useState([]);
@@ -33,7 +34,7 @@ export default function App() {
   const [clienteActual, setClienteActual] = useState(null);
   const [cardNumber, setCardNumber] = useState('');
 
-  // --- ESTADO DE NOTIFICACIONES (ÉXITO/ERROR) ---
+  // --- ESTADO DE NOTIFICACIONES ---
   const [notificacion, setNotificacion] = useState({
     isOpen: false, tipo: 'exito', titulo: '', mensaje: ''
   });
@@ -45,17 +46,21 @@ export default function App() {
   );
 
   // --- MANEJO DE LOGIN ---
-  const handleLogin = (user) => {
-    setUsername(user);
-    // Regla: Solo 'admin' entra al panel, los demás a la terminal
-    if (user.toLowerCase() === 'admin') {
+  // Ahora recibe un objeto con id y nombre
+  const handleLogin = (datosUsuario) => {
+    setUsername(datosUsuario.nombre);
+    setIdEmpleado(datosUsuario.id);
+    
+
+    // Regla: Solo 'admin' entra al panel
+    if (datosUsuario.nombre === 'Administrador') {
       setPage('admin-reportes');
     } else {
       setPage('pos');
     }
   };
  
-  // --- MANEJO DE PRODUCTOS --- 
+  // --- CARGAR PRODUCTOS --- 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -65,20 +70,15 @@ export default function App() {
         console.error("Error cargando productos:", error);
       }
     };
-
     fetchProducts();
   }, []);
 
-  
   // --- MANEJO DEL CARRITO ---
   const handleAddProduct = (product) => {
     setTicketItems((current) => {
       const existing = current.find((item) => item.id === product.id);
-      
-      // Calculamos cuántos tiene el empleado actualmente en el ticket
       const cantidadEnTicket = existing ? existing.quantity : 0;
 
-      // Verificamos si al agregar uno más se supera el stock disponible
       if (cantidadEnTicket >= product.stock) {
         setNotificacion({
           isOpen: true, 
@@ -86,10 +86,9 @@ export default function App() {
           titulo: 'Stock insuficiente', 
           mensaje: `Solo hay ${product.stock} unidades de "${product.name}" disponibles.`
         });
-        return current; // Retorna el carrito sin cambios
+        return current; 
       }
 
-      // Si sí hay stock, lo agregamos normalmente
       if (existing) {
         return current.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
@@ -101,50 +100,61 @@ export default function App() {
 
   const handleEmptyTicket = () => setTicketItems([]);
 
-  // --- FLUJO SECUENCIAL DE COMPRA ---
+  // --- FLUJO DE COMPRA ---
+  const handleStartPurchase = () => setShowIdentificar(true);
 
-  // 1. Iniciar identificación (se dispara al dar clic en Procesar Pago)
-  const handleStartPurchase = () => {
-    setShowIdentificar(true);
-  };
-
-  // 2. Si el cliente se encuentra en la base de datos
   const handleClientFound = (cliente) => {
     setClienteActual(cliente);
     setShowIdentificar(false);
-    setShowPagoModal(true); // Saltamos directo al cobro
+    setShowPagoModal(true); 
   };
 
-  // 3. Si el cliente NO se encuentra, pasamos a registrarlo
   const handleGoToRegister = () => {
     setShowIdentificar(false);
     setShowRegistrarModal(true);
   };
 
-  // 4. Tras registrar un nuevo cliente con éxito
   const handleAfterRegister = (nuevoCliente) => {
     setClienteActual(nuevoCliente);
     setShowRegistrarModal(false);
-    setShowPagoModal(true); // Una vez creado, procedemos al cobro de inmediato
+    setShowPagoModal(true); 
   };
 
-  // --- MANEJO DE REPORTES ---
-  const handleGenerateReport = async (mes) => {
+  // --- MANEJO DE REPORTES FIRMADOS (ECDSA) ---
+  const handleGenerateReport = async (periodo, llavePrivada, ventasDelMes) => {
     try {
-      await apiClient.generateReport(mes);
+      const totalVentas = ventasDelMes.length;
+      const montoTotal = ventasDelMes.reduce((sum, venta) => sum + venta.monto, 0);
+
+      const payload = {
+        idEmpleado: idEmpleado, 
+        periodo: periodo, 
+        totalVentas: totalVentas,
+        montoTotal: montoTotal,
+        llavePrivada: llavePrivada 
+      };
+
+      const respuestaServidor = await apiClient.firmarYEnviarReporte(payload);
+      
       setNotificacion({
-        isOpen: true, tipo: 'exito', titulo: 'Reporte Generado', mensaje: `El reporte de ${mes} ha sido firmado y guardado.`
+        isOpen: true, 
+        tipo: 'exito', 
+        titulo: 'Firma Exitosa', 
+        mensaje: respuestaServidor
       });
+
     } catch (error) {
       setNotificacion({
-        isOpen: true, tipo: 'error', titulo: 'Error de Firma', mensaje: error.message
+        isOpen: true, 
+        tipo: 'error', 
+        titulo: 'Error de Verificación', 
+        mensaje: error.message
       });
     }
   };
 
   return (
     <>
-      {/* VISTAS PRINCIPALES */}
       {page === 'login' && <LoginPantalla onLogin={handleLogin} />}
       
       {page === 'pos' && (
@@ -153,9 +163,10 @@ export default function App() {
           ticketItems={ticketItems}
           total={total}
           username={username}
+          idEmpleado={idEmpleado}
           onAddProduct={handleAddProduct}
           onEmptyTicket={handleEmptyTicket}
-          onProcessPayment={handleStartPurchase} // Inicia el flujo de identificación
+          onProcessPayment={handleStartPurchase} 
           onGenerateReport={() => setShowReporteModal(true)}
           onRegisterClient={() => setShowRegistrarModal(true)}
         />
@@ -164,9 +175,7 @@ export default function App() {
       {page === 'admin-reportes' && <AdminReportes onNavigate={() => setPage('admin-ventas')} />}
       {page === 'admin-ventas' && <AdminVentas onNavigate={() => setPage('admin-reportes')} />}
 
-      {/* --- MODALES DEL FLUJO DE VENTA --- */}
-      
-      {/* Paso 1: Buscar cliente */}
+      {/* MODALES */}
       <ModalIdentificarCliente 
         isOpen={showIdentificar}
         onClose={() => setShowIdentificar(false)}
@@ -174,19 +183,18 @@ export default function App() {
         onRegisterNew={handleGoToRegister}
       />
 
-      {/* Paso 2 (Opcional): Registrar si no existe */}
       <ModalRegistrarCliente 
         isOpen={showRegistrarModal}
         onClose={() => setShowRegistrarModal(false)}
         onSave={handleAfterRegister} 
       />
 
-      {/* Paso Final: Realizar el cobro seguro */}
       <ModalPagoSeguro 
         isOpen={showPagoModal}
         total={total}
         ticketItems={ticketItems}
         username={username}
+        idEmpleado={idEmpleado}
         cliente={clienteActual}
         cardNumber={cardNumber}
         onCardNumberChange={setCardNumber}
@@ -198,12 +206,11 @@ export default function App() {
         }}
       />
 
-      {/* --- OTROS MODALES --- */}
-
       <GenerarReporteModal
         isOpen={showReporteModal}
         onClose={() => setShowReporteModal(false)}
         onGenerate={handleGenerateReport}
+        idEmpleado={idEmpleado}
       />
 
       <NotificacionModal

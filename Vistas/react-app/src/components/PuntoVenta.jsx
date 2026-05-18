@@ -4,7 +4,8 @@ export default function TerminalVentas({
   products = [], 
   ticketItems = [], 
   total = 0, 
-  username = 'Juan Pérez',
+  username = 'Empleado',
+  idEmpleado = 'N/A', //  1. RECIBIMOS EL ID AQUÍ
   onAddProduct,
   onEmptyTicket,
   onProcessPayment,
@@ -19,8 +20,15 @@ export default function TerminalVentas({
         
         <header className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-brand-dark">Terminal para ventas</h1>
-          <div className="text-brand-teal font-bold border-b-2 border-brand-teal pb-1">
-            Empleado: {username}
+          
+          {/*  2. MOSTRAMOS EL NOMBRE Y EL ID */}
+          <div className="text-right border-b-2 border-brand-teal pb-1">
+            <div className="text-brand-teal font-bold text-lg">
+              {username}
+            </div>
+            <div className="text-xs text-gray-500 font-mono tracking-widest font-bold">
+              ID: {idEmpleado}
+            </div>
           </div>
         </header>
 
@@ -49,11 +57,11 @@ export default function TerminalVentas({
                 <button
                   type="button"
                   onClick={() => onAddProduct(product)}
-                  disabled={product.stock === 0} // ¡Se bloquea si es 0!
+                  disabled={product.stock === 0} 
                   className={`px-4 py-2 rounded-lg transition shadow-sm text-sm font-semibold ${
                     product.stock === 0
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed' // Estilo apagado
-                      : 'bg-brand-dark text-white hover:bg-brand-teal' // Estilo normal
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                      : 'bg-brand-dark text-white hover:bg-brand-teal' 
                   }`}
                 >
                   {product.stock === 0 ? 'Agotado' : '+ Agregar'}
