@@ -1,4 +1,4 @@
-// Ya no se usara
+/* 
 package mx.ipn.escom.crypto.terminal_empleado.controller;
 
 import org.springframework.http.ResponseEntity;
@@ -47,4 +47,4 @@ public class ReporteController {
         
         return ResponseEntity.internalServerError().build();
     }
-}
+}*/

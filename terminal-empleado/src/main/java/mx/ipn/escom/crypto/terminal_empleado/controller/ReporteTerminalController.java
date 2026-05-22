@@ -1,11 +1,16 @@
 package mx.ipn.escom.crypto.terminal_empleado.controller;
 
+import mx.ipn.escom.crypto.terminal_empleado.dto.EncryptedPayloadDto;
 import mx.ipn.escom.crypto.terminal_empleado.dto.ReporteFirmaDto;
+import mx.ipn.escom.crypto.terminal_empleado.service.EncryptionService;
 import mx.ipn.escom.crypto.terminal_empleado.service.FirmaDigitalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import mx.ipn.escom.crypto.terminal_empleado.service.HandshakeClientService;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +29,15 @@ public class ReporteTerminalController {
 
     @Autowired
     private FirmaDigitalService firmaDigitalService;
+
+    @Autowired 
+    private EncryptionService encryptionService;
+
+    @Autowired 
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private HandshakeClientService handshakeService;
 
     // --- 1. MÉTODO PARA OBTENER LAS VENTAS (Llena la tabla de React) ---
     @GetMapping("/ventas")
@@ -61,6 +75,14 @@ public class ReporteTerminalController {
 
             System.out.println("¡Firma ECDSA generada exitosamente!");
 
+            // 2. Obtenemos la llave AES 
+            byte[] llaveAesEfimera = handshakeService.getSessionAesKey();
+            
+            // Validación de seguridad: Si no hay llave, los sacamos
+            if (llaveAesEfimera == null) {
+                return ResponseEntity.status(401).body("Error de seguridad: No hay sesión AES activa. Por favor, vuelva a iniciar sesión.");
+            }
+
             // 3. Preparamos el paquete seguro para el Servidor Central (8080)
             Map<String, Object> payloadParaServidorCentral = new HashMap<>();
             payloadParaServidorCentral.put("idEmpleado", dto.getIdEmpleado());
@@ -69,15 +91,24 @@ public class ReporteTerminalController {
             payloadParaServidorCentral.put("montoTotal", dto.getMontoTotal());
             payloadParaServidorCentral.put("cadenaOriginal", cadenaOriginal);
             payloadParaServidorCentral.put("firmaDigital", firmaDigital);
+            // 4. Convertimos a JSON y ENCRIPTAMOS con AES-GCM
+            String jsonPlano = objectMapper.writeValueAsString(payloadParaServidorCentral);
+            String payloadEncriptadoBase64 = encryptionService.encrypt(jsonPlano, llaveAesEfimera);
 
-            // 4. Lo enviamos por la red al Servidor Central
+            // 5. Armamos el sobre que viaja por la red (ID público, Datos privados)
+            Map<String, Object> paqueteSeguro = new HashMap<>();
+            paqueteSeguro.put("idEmpleado", payloadParaServidorCentral.get("idEmpleado")); // Este ID es público, no es sensible
+            paqueteSeguro.put("deviceId", "terminal-001");
+            paqueteSeguro.put("payloadEncriptado", payloadEncriptadoBase64);
+
+            // 6. Enviamos el sobre cifrado al Servidor Central (8080)
             ResponseEntity<String> response = restTemplate.postForEntity(
-                    SERVER_URL_FIRMA, 
-                    payloadParaServidorCentral, 
+                    SERVER_URL_FIRMA,
+                    paqueteSeguro, 
                     String.class
             );
-
-            return ResponseEntity.ok(response.getBody());
+            
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
 
         } catch (Exception e) {
             e.printStackTrace();
