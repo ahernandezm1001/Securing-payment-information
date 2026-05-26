@@ -10,6 +10,8 @@ public class TicketDto {
     private String noTarjetaPago;
     private BigDecimal montoTotal;
     private List<DetalleTicketDto> detalles;
+    private String tarjetaFpe;
+    private String nombreCliente;
 
     // Getters y Setters
     public Long getIdCliente() {
@@ -50,5 +52,12 @@ public class TicketDto {
 
     public void setDetalles(List<DetalleTicketDto> detalles) {
         this.detalles = detalles;
+    }
+    public String getTarjetaFpe() { 
+        return tarjetaFpe; 
+    }
+    
+    public String getNombreCliente() { 
+        return nombreCliente; 
     }
 }

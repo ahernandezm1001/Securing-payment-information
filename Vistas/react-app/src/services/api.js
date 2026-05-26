@@ -167,5 +167,23 @@ export const apiClient = {
         method: 'POST'
     });
     return await response.json();
+  },
+  async getClientesRegistrados() {
+    const response = await fetch('http://localhost:8080/api/server/admin/ventas/clientes');
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al cargar clientes');
+    }
+    return await response.json();
+  },
+
+  // Obtiene el historial detallado usando el token FPE
+  async getHistorialVentasCliente(tarjetaFpe) {
+    const response = await fetch(`http://localhost:8080/api/server/admin/ventas/historial/${encodeURIComponent(tarjetaFpe)}`);
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Error al cargar el historial del cliente');
+    }
+    return await response.json();
   }
 };
