@@ -27,7 +27,8 @@ public class ReporteTerminalController {
     private final String SERVER_URL_VENTAS = "http://localhost:8080/api/server/reportes/ventas";
     private final String SERVER_URL_FIRMA = "http://localhost:8080/api/server/reportes/guardar-firmado";
     private final String SERVER_URL_TODOS = "http://localhost:8080/api/server/reportes/todos";
-
+    private final String SERVER_URL_VERIFICAR = "http://localhost:8080/api/server/reportes/verificar/";
+    
     @Autowired
     private FirmaDigitalService firmaDigitalService;
 
@@ -123,6 +124,18 @@ public class ReporteTerminalController {
         } catch (Exception e) {
             System.err.println("Error conectando al Servidor Central para reportes: " + e.getMessage());
             return ResponseEntity.internalServerError().body(List.of());
+        }
+    }
+    @PostMapping("/verificar/{idReporte}")
+    public ResponseEntity<?> verificarFirma(@PathVariable Long idReporte) {
+        try {
+            String urlConId = SERVER_URL_VERIFICAR + idReporte;
+            // Hacemos el POST al 8080
+            ResponseEntity<Map> response = restTemplate.postForEntity(urlConId, null, Map.class);
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+        } catch (Exception e) {
+            System.err.println("Error conectando al Servidor Central para verificar: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("valido", false, "message", "No se pudo conectar con el servidor central."));
         }
     }
 }

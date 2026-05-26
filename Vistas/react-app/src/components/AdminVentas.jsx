@@ -37,7 +37,7 @@ export default function AdminVentas({ onCambiarVista, onLogout }) {
       {/* HEADER SUPERIOR */}
       <header className="bg-brand-dark text-white px-8 py-4 flex justify-between items-center shadow-md h-[70px]">
         <div className="text-xl font-bold flex items-center gap-3">
-           <span className="text-brand-teal">Admin:</span> Don Diego
+           <span className="text-brand-teal">Admin:</span> XYZ Store
         </div>
         <div className="flex gap-4 items-center">
           <button 

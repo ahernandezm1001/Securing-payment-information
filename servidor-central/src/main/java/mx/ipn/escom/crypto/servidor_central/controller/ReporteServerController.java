@@ -1,6 +1,7 @@
 package mx.ipn.escom.crypto.servidor_central.controller;
 
 import mx.ipn.escom.crypto.servidor_central.entity.DetalleTicket;
+import mx.ipn.escom.crypto.servidor_central.entity.Empleado;
 import mx.ipn.escom.crypto.servidor_central.entity.ReporteFirmado;
 import mx.ipn.escom.crypto.servidor_central.entity.Ticket;
 import mx.ipn.escom.crypto.servidor_central.repository.DetalleTicketRepository;
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
@@ -25,6 +28,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.security.KeyFactory;
+import java.security.Signature;
+import java.util.Base64;
+import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/api/server/reportes")
@@ -198,6 +206,65 @@ public class ReporteServerController {
         } catch (Exception e) {
             System.err.println("❌ Error obteniendo la lista de reportes: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
+        }
+    }
+    @PostMapping("/verificar/{idReporte}")
+    public ResponseEntity<Map<String, Object>> verificarFirma(@PathVariable Long idReporte) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            System.out.println("LLEGÓ AL 8080 -> Verificando matemáticamente el reporte #" + idReporte);
+
+            // 1. Buscamos el reporte
+            var reporteOpt = reporteFirmadoRepository.findById(idReporte);
+            if (!reporteOpt.isPresent()) {
+                response.put("valido", false);
+                response.put("message", "El reporte no existe en la base de datos.");
+                return ResponseEntity.badRequest().body(response);
+            }
+            ReporteFirmado reporte = reporteOpt.get();
+
+            // 2. Buscamos al empleado para obtener su LLAVE PÚBLICA
+            var empleadoOpt = empleadoRepository.findById(reporte.getIdEmpleado());
+            if (!empleadoOpt.isPresent()) {
+                response.put("valido", false);
+                response.put("message", "El empleado asociado no existe o fue eliminado.");
+                return ResponseEntity.badRequest().body(response);
+            }
+            Empleado empleado = empleadoOpt.get();
+
+            // 3. Verificación ECDSA con Bouncy Castle
+            byte[] publicBytes = Base64.getDecoder().decode(empleado.getLlavePublica());
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicBytes);
+            KeyFactory keyFactory = KeyFactory.getInstance("ECDSA", "BC");
+            PublicKey publicKey = keyFactory.generatePublic(keySpec);
+
+            Signature signature = Signature.getInstance("SHA256withECDSA", "BC");
+            signature.initVerify(publicKey);
+            
+            // Le pasamos la cadena original que está en la BD
+            signature.update(reporte.getCadenaOriginal().getBytes("UTF-8"));
+            
+            // Verificamos contra la firma digital
+            byte[] signatureBytes = Base64.getDecoder().decode(reporte.getFirmaDigital());
+            boolean isValido = signature.verify(signatureBytes);
+
+            if (isValido) {
+                System.out.println(" VERIFICACIÓN EXITOSA: La firma coincide.");
+                response.put("valido", true);
+                response.put("message", "VERIFICACIÓN EXITOSA: La firma es auténtica, el empleado es el autor real y el documento no ha sido alterado.");
+            } else {
+                System.out.println(" ALERTA: La firma no coincide con el documento.");
+                response.put("valido", false);
+                response.put("message", "ALERTA CRÍTICA: La firma es inválida. El documento pudo haber sido alterado o no pertenece a este empleado.");
+            }
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.put("valido", false);
+            response.put("message", "Error técnico al procesar la criptografía: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
         }
     }
 }

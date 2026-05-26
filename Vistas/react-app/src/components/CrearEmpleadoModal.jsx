@@ -72,7 +72,7 @@ export default function CrearEmpleadoModal({ isOpen, onClose }) {
           </div>
 
           <div className="mb-6">
-            <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Contraseña (Se guardará Hasheada)</label>
+            <label className="block text-xs font-black text-gray-500 uppercase tracking-widest mb-2">Contraseña</label>
             <input 
               type="password" 
               value={password}

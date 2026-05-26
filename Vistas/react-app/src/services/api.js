@@ -159,5 +159,13 @@ export const apiClient = {
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Error al crear empleado');
     return data;
+  },
+  // Verifica criptográficamente un reporte
+  async verificarFirmaReporte(idReporte) {
+    // Apuntamos al 8081 usando POST
+    const response = await fetch(`http://localhost:8081/api/reportes/verificar/${idReporte}`, {
+        method: 'POST'
+    });
+    return await response.json();
   }
 };

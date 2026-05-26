@@ -8,14 +8,16 @@ export default function AdminReportes({ onCambiarVista, onLogout }) {
   const [cargando, setCargando] = useState(true);
   const [showCrearModal, setShowCrearModal] = useState(false);
 
-  // Cargar datos reales al montar el componente
+  const [verificando, setVerificando] = useState(false);
+  const [resultadoFirma, setResultadoFirma] = useState(null); // { valido: boolean, message: string }
+
   useEffect(() => {
     const fetchReportes = async () => {
       try {
         setCargando(true);
         const data = await apiClient.getAllReportes();
         setReportes(data);
-        if (data.length > 0) setReporteActivo(data[0]); // Seleccionamos el primero por defecto
+        if (data.length > 0) setReporteActivo(data[0]);
       } catch (error) {
         console.error("Error cargando reportes:", error);
       } finally {
@@ -25,30 +27,50 @@ export default function AdminReportes({ onCambiarVista, onLogout }) {
     fetchReportes();
   }, []);
 
-  const verificarFirma = () => {
+  const verificarFirma = async () => {
     if(!reporteActivo) return;
-    alert(`Verificando firma de ${reporteActivo.nombreEmpleado}...\nFirma ECDSA: ${reporteActivo.firmaDigital ? 'PRESENTE' : 'AUSENTE'}`);
-    // Aquí implementaremos la validación real después
+    
+    setVerificando(true);
+    setResultadoFirma(null);
+
+    try {
+      // Llamada real a la API
+      const resultado = await apiClient.verificarFirmaReporte(reporteActivo.idReporte);
+      
+      setTimeout(() => {
+        setResultadoFirma(resultado);
+        setVerificando(false);
+      }, 1000);
+
+    } catch (error) {
+      setTimeout(() => {
+        setResultadoFirma({ valido: false, message: "Error de conexión con el motor de Bouncy Castle en el servidor." });
+        setVerificando(false);
+      }, 1000);
+    }
   };
 
-  // Función segura para parsear los detalles de ventas
+  const cerrarModalVerificacion = () => {
+    setResultadoFirma(null);
+    setVerificando(false);
+  };
+
   const obtenerDetallesSeguros = (jsonString) => {
     try {
       if (!jsonString) return [];
       return JSON.parse(jsonString);
     } catch (e) {
-      console.error("Error al leer los detalles de ventas:", e);
       return [];
     }
   };
 
   return (
-    <div className="font-sans flex flex-col h-screen overflow-hidden">
+    <div className="font-sans flex flex-col h-screen overflow-hidden relative">
       
       {/* HEADER PRINCIPAL */}
       <header className="bg-brand-dark text-white px-8 py-4 flex justify-between items-center shadow-md h-[70px]">
         <div className="text-xl font-bold flex items-center gap-3">
-           <span className="text-brand-teal">Admin:</span> Don Diego
+           <span className="text-brand-teal">Admin:</span> XYZ Store
         </div>
         <div className="flex gap-4 items-center">
           <button 
@@ -109,14 +131,13 @@ export default function AdminReportes({ onCambiarVista, onLogout }) {
         </div>
 
         {/* CONTENIDO: Detalle del Reporte */}
-        <div className="w-2/3 p-8 overflow-y-auto bg-gray-50">
+        <div className="w-2/3 p-8 overflow-y-auto bg-gray-50 relative">
           {!reporteActivo ? (
             <div className="flex h-full items-center justify-center text-gray-400 font-medium">
               Selecciona un reporte de la lista para ver sus detalles criptográficos
             </div>
           ) : (
             <>
-              {/* Cabecera del reporte activo */}
               <div className="bg-white p-6 rounded-xl shadow-md mb-8 flex justify-between items-center border-t-4 border-brand-dark">
                 <div>
                   <h1 className="text-brand-dark text-2xl font-bold mb-2">Reporte - {reporteActivo.periodo}</h1>
@@ -125,12 +146,13 @@ export default function AdminReportes({ onCambiarVista, onLogout }) {
                 <div>
                   <button 
                     onClick={verificarFirma}
-                    className="bg-brand-dark text-white font-bold py-3 px-6 rounded-xl hover:bg-brand-teal transition shadow-md flex items-center gap-2"
+                    disabled={verificando}
+                    className="bg-brand-dark text-white font-bold py-3 px-6 rounded-xl hover:bg-brand-teal transition shadow-md flex items-center gap-2 disabled:opacity-50"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
-                    Verificar firma
+                    {verificando ? 'Analizando...' : 'Verificar firma'}
                   </button>
                 </div>
               </div>
@@ -143,7 +165,6 @@ export default function AdminReportes({ onCambiarVista, onLogout }) {
                   </svg>
                   Desglose de Ventas del Periodo
                 </h2>
-
                 <div className="overflow-x-auto">
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-gray-50 border-y border-gray-200">
@@ -163,80 +184,123 @@ export default function AdminReportes({ onCambiarVista, onLogout }) {
                           </tr>
                         ))
                       ) : (
-                        <tr>
-                          <td colSpan="3" className="p-4 text-center text-gray-400 text-sm">
-                            No hay detalles registrados para este reporte.
-                          </td>
-                        </tr>
+                        <tr><td colSpan="3" className="p-4 text-center text-gray-400 text-sm">No hay detalles registrados para este reporte.</td></tr>
                       )}
                     </tbody>
                     <tfoot className="bg-gray-50 border-t-2 border-brand-light">
                       <tr>
                         <td colSpan="2" className="p-4 text-right font-bold text-brand-dark">TOTAL REPORTADO:</td>
-                        <td className="p-4 text-right font-black text-brand-primary text-lg">
-                          ${reporteActivo.montoTotal?.toFixed(2) || '0.00'}
-                        </td>
+                        <td className="p-4 text-right font-black text-brand-primary text-lg">${reporteActivo.montoTotal?.toFixed(2) || '0.00'}</td>
                       </tr>
                     </tfoot>
                   </table>
                 </div>
               </div>
 
-              {/* Sección de Validación Criptográfica - Estilo Auditoría */}
-              <div className="mt-8 space-y-6">
+              {/* Detalles de la Firma */}
+              <div className="mt-8 space-y-6 pb-10">
                 <h2 className="text-xl font-black text-brand-dark flex items-center gap-2 border-b-2 border-brand-light pb-2">
                   <svg className="w-6 h-6 text-brand-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                   </svg>
-                  Auditoría Criptográfica
+                  Detalles de la Firma
                 </h2>
-
                 <div className="grid grid-cols-1 gap-6">
-                  
-                  {/* 1. Tarjeta de la Cadena Original (Estilo Ticket Punteado) */}
                   <div className="bg-white rounded-xl p-5 border-2 border-dashed border-gray-300 relative overflow-hidden group hover:border-brand-teal transition-colors shadow-sm">
                     <div className="absolute top-0 left-0 w-2 h-full bg-gray-200 group-hover:bg-brand-teal transition-colors"></div>
                     <div className="pl-4">
-                      <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        Cadena Original (Texto Plano)
-                      </h3>
-                      <p className="font-mono text-sm text-brand-dark bg-gray-50 p-4 rounded-lg border border-gray-100 shadow-inner overflow-x-auto whitespace-nowrap">
-                        {reporteActivo.cadenaOriginal}
-                      </p>
+                      <h3 className="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2">Cadena Original (Texto Plano)</h3>
+                      <p className="font-mono text-sm text-brand-dark bg-gray-50 p-4 rounded-lg border border-gray-100 shadow-inner overflow-x-auto whitespace-nowrap">{reporteActivo.cadenaOriginal}</p>
                     </div>
                   </div>
-
-                  {/* 2. Tarjeta de la Firma Digital (Estilo Terminal Segura) */}
                   <div className="bg-brand-dark rounded-xl p-6 border border-gray-700 relative shadow-xl overflow-hidden">
                     <div className="absolute opacity-5 -right-4 -top-8">
-                      <svg className="w-48 h-48 text-brand-primary" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V12a2 2 0 00-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm3 10c-1.103 0-2-.897-2-2s.897-2 2-2 2 .897 2 2-.897 2-2 2z" />
-                      </svg>
+                      <svg className="w-48 h-48 text-brand-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V12a2 2 0 00-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7zm3 10c-1.103 0-2-.897-2-2s.897-2 2-2 2 .897 2 2-.897 2-2 2z" /></svg>
                     </div>
-                    
                     <div className="relative z-10">
-                      <h3 className="text-[11px] font-black text-brand-teal uppercase tracking-widest mb-3 flex items-center gap-2">
-                        <svg className="w-4 h-4 text-brand-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
-                        Firma Digital (ECDSA - Base64)
-                      </h3>
-                      <p className="font-mono text-sm text-gray-300 bg-black bg-opacity-50 p-4 rounded-lg break-all shadow-inner leading-relaxed border border-gray-800">
-                        {reporteActivo.firmaDigital}
-                      </p>
+                      <h3 className="text-[11px] font-black text-brand-teal uppercase tracking-widest mb-3">Firma Digital (ECDSA - Base64)</h3>
+                      <p className="font-mono text-sm text-gray-300 bg-black bg-opacity-50 p-4 rounded-lg break-all shadow-inner leading-relaxed border border-gray-800">{reporteActivo.firmaDigital}</p>
                     </div>
                   </div>
-
                 </div>
               </div>
             </>
           )}
         </div>
       </div>
+
       <CrearEmpleadoModal isOpen={showCrearModal} onClose={() => setShowCrearModal(false)} />
+
+      {/* =========================================
+          MODAL DE VERIFICACIÓN CRIPTOGRÁFICA 
+          ========================================= */}
+      {(verificando || resultadoFirma) && (
+        <div className="fixed inset-0 bg-brand-dark bg-opacity-90 backdrop-blur-md flex items-center justify-center z-[5000]">
+          
+          <div className={`bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 ${resultadoFirma ? 'scale-100 opacity-100' : 'scale-95 opacity-90'}`}>
+            
+            {/* Estado: Cargando / Analizando */}
+            {verificando && !resultadoFirma && (
+              <div className="p-10 flex flex-col items-center justify-center">
+                <div className="relative w-20 h-20 mb-6">
+                  <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
+                  <div className="absolute inset-0 border-4 border-brand-teal rounded-full border-t-transparent animate-spin"></div>
+                  <svg className="w-8 h-8 text-brand-teal absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                </div>
+                <h3 className="text-xl font-bold text-brand-dark mb-2">Desencriptando paquete...</h3>
+                <p className="text-gray-500 font-mono text-sm animate-pulse">Calculando curva elíptica secp256r1</p>
+              </div>
+            )}
+
+            {/* Estado: Resultado Listo */}
+            {resultadoFirma && (
+              <div className="text-center">
+                
+                {/* Cabecera del Modal (Verde si éxito, Rojo si error) */}
+                <div className={`py-8 px-6 ${resultadoFirma.valido ? 'bg-green-500' : 'bg-red-500'} flex justify-center`}>
+                  {resultadoFirma.valido ? (
+                    <div className="bg-white rounded-full p-4 shadow-lg">
+                      <svg className="w-16 h-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                  ) : (
+                    <div className="bg-white rounded-full p-4 shadow-lg">
+                      <svg className="w-16 h-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </div>
+                  )}
+                </div>
+
+                {/* Contenido del resultado */}
+                <div className="p-8">
+                  <h3 className={`text-2xl font-black mb-2 ${resultadoFirma.valido ? 'text-green-600' : 'text-red-600'}`}>
+                    {resultadoFirma.valido ? '¡Firma Auténtica!' : '¡Alerta de Seguridad!'}
+                  </h3>
+                  
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 mb-6 text-left shadow-inner">
+                    <p className="text-gray-700 text-sm leading-relaxed font-medium">
+                      {resultadoFirma.message}
+                    </p>
+                  </div>
+
+                  {/* Datos técnicos (solo si falló, para darle dramatismo) */}
+                  {!resultadoFirma.valido && (
+                    <p className="text-xs font-mono text-red-400 mb-6 border border-red-100 bg-red-50 p-2 rounded">
+                      [ERROR] Exception: ECDSA Signature Mismatch
+                    </p>
+                  )}
+
+                  <button 
+                    onClick={cerrarModalVerificacion}
+                    className="w-full bg-brand-dark text-white font-bold py-3 px-4 rounded-xl hover:bg-gray-800 transition shadow-md"
+                  >
+                    Aceptar y Cerrar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

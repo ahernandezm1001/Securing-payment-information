@@ -79,7 +79,7 @@ public class EmpleadoServerController {
             // 4. Respondemos a React entregando la llave PRIVADA por única vez
             response.put("success", true);
             response.put("message", "Empleado creado exitosamente.");
-            response.put("llavePrivada", privateKeyBase64); // 👈 React la descargará
+            response.put("llavePrivada", privateKeyBase64);
             
             return ResponseEntity.ok(response);
 
