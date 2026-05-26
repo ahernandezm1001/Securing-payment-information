@@ -34,4 +34,7 @@ public class ReporteFirmado {
 
     @Column(name = "fecha_creacion")
     private LocalDateTime fechaCreacion;
+    
+    @Column(name = "detalles_ventas", columnDefinition = "TEXT")
+    private String detallesVentas;
 }

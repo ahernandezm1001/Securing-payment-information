@@ -6,6 +6,7 @@ public class ReporteFirmaDto {
     private Integer totalVentas; // Cuántos tickets se vendieron
     private Double montoTotal;
     private String llavePrivada; // El texto en Base64 del archivo .key
+    private String detallesVentas;
 
     public Long getIdEmpleado() {
         return idEmpleado;
@@ -46,4 +47,6 @@ public class ReporteFirmaDto {
     public void setLlavePrivada(String llavePrivada) {
         this.llavePrivada = llavePrivada;
     }
+    public String getDetallesVentas() { return detallesVentas; }
+    public void setDetallesVentas(String detallesVentas) { this.detallesVentas = detallesVentas; }
 }

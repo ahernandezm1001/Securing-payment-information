@@ -4,6 +4,7 @@ import mx.ipn.escom.crypto.servidor_central.entity.DetalleTicket;
 import mx.ipn.escom.crypto.servidor_central.entity.ReporteFirmado;
 import mx.ipn.escom.crypto.servidor_central.entity.Ticket;
 import mx.ipn.escom.crypto.servidor_central.repository.DetalleTicketRepository;
+import mx.ipn.escom.crypto.servidor_central.repository.EmpleadoRepository;
 import mx.ipn.escom.crypto.servidor_central.repository.ReporteFirmadoRepository;
 import mx.ipn.escom.crypto.servidor_central.repository.TicketRepository;
 import mx.ipn.escom.crypto.servidor_central.service.DecryptionService;
@@ -47,6 +48,9 @@ public class ReporteServerController {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private EmpleadoRepository empleadoRepository;
 
     @GetMapping("/ventas")
     public ResponseEntity<List<Map<String, Object>>> obtenerVentasDelMes(
@@ -96,6 +100,7 @@ public class ReporteServerController {
             // 1. Leemos ÚNICAMENTE las etiquetas públicas de afuera del sobre
             String deviceId = (String) sobreSeguro.get("deviceId");
             String payloadEncriptado = (String) sobreSeguro.get("payloadEncriptado");
+            
 
             // 2. Buscamos la llave AES usando el deviceId en tu KeyExchangeService
             byte[] llaveAes = keyExchangeService.getClientKey(deviceId);
@@ -119,6 +124,7 @@ public class ReporteServerController {
             String periodo = (String) payload.get("periodo");
             String cadenaOriginal = (String) payload.get("cadenaOriginal");
             String firmaDigital = (String) payload.get("firmaDigital");
+            String detallesVentas = (String) payload.get("detallesVentas");
 
             var reporteExistente = reporteFirmadoRepository.findByIdEmpleadoAndPeriodo(idEmpleado, periodo);
             ReporteFirmado reporteAGuardar;
@@ -138,6 +144,7 @@ public class ReporteServerController {
             reporteAGuardar.setCadenaOriginal(cadenaOriginal);
             reporteAGuardar.setFirmaDigital(firmaDigital);
             reporteAGuardar.setFechaCreacion(LocalDateTime.now()); 
+            reporteAGuardar.setDetallesVentas(detallesVentas);
 
             reporteFirmadoRepository.save(reporteAGuardar);
 
@@ -149,6 +156,48 @@ public class ReporteServerController {
             System.err.println("Error procesando el reporte seguro: " + e.getMessage());
             e.printStackTrace(); // Para ver exactamente en qué línea falló si hay otro error
             return ResponseEntity.badRequest().body("Ocurrió un error al intentar guardar el reporte cifrado.");
+        }
+        
+    }
+    @GetMapping("/todos")
+    public ResponseEntity<List<Map<String, Object>>> obtenerTodosLosReportes() {
+        try {
+            System.out.println("LLEGÓ AL 8080 -> Solicitando lista global de reportes...");
+            List<ReporteFirmado> reportes = reporteFirmadoRepository.findAll();
+            List<Map<String, Object>> respuesta = new ArrayList<>();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+            for (ReporteFirmado r : reportes) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("idReporte", r.getIdReporte());
+                map.put("periodo", r.getPeriodo());
+                map.put("totalVentas", r.getTotalVentas());
+                map.put("montoTotal", r.getMontoTotal());
+                map.put("detallesVentas", r.getDetallesVentas());
+                
+                // Formateamos la fecha si existe
+                if (r.getFechaCreacion() != null) {
+                    map.put("fechaSubida", r.getFechaCreacion().format(formatter));
+                } else {
+                    map.put("fechaSubida", "Desconocida");
+                }
+
+                // Buscamos el nombre del empleado
+                var empleadoOpt = empleadoRepository.findById(r.getIdEmpleado());
+                map.put("nombreEmpleado", empleadoOpt.isPresent() ? empleadoOpt.get().getNombreCompleto() : "Empleado Eliminado/Desconocido");
+
+                // Mandamos la firma y cadena para la futura validación
+                map.put("cadenaOriginal", r.getCadenaOriginal());
+                map.put("firmaDigital", r.getFirmaDigital());
+
+                respuesta.add(map);
+            }
+
+            return ResponseEntity.ok(respuesta);
+
+        } catch (Exception e) {
+            System.err.println("❌ Error obteniendo la lista de reportes: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

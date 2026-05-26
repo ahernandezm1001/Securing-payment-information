@@ -127,5 +127,27 @@ export const apiClient = {
     
     // Retornamos el mensaje de éxito del servidor
     return await response.text();
+  },
+  
+  // 1. Obtiene TODOS los reportes de TODOS los empleados
+  async getAllReportes() {
+    const response = await fetch(`${API_BASE_URL}/reportes/todos`);
+    if (!response.ok) throw new Error('Error al cargar todos los reportes');
+    return await response.json();
+  },
+
+  // 2. Obtiene TODO el historial de ventas global
+  async getAllVentasGlobales() {
+    // Si tienes un endpoint global úsalo, sino podemos pedir el mes actual por defecto
+    const response = await fetch(`${API_BASE_URL}/reportes/ventas-globales`); 
+    if (!response.ok) throw new Error('Error al cargar ventas globales');
+    return await response.json();
+  },
+
+  // 3. Obtiene todos los clientes registrados
+  async getAllClientes() {
+    const response = await fetch(`${API_BASE_URL}/clientes/todos`);
+    if (!response.ok) throw new Error('Error al cargar clientes');
+    return await response.json();
   }
 };

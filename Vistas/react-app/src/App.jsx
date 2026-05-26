@@ -45,6 +45,8 @@ export default function App() {
     [ticketItems]
   );
 
+  const [vistaAdmin, setVistaAdmin] = useState('reportes'); // 'reportes' o 'ventas'
+
   // --- MANEJO DE LOGIN ---
   // Ahora recibe un objeto con id y nombre
   const handleLogin = (datosUsuario) => {
@@ -127,11 +129,12 @@ export default function App() {
       const montoTotal = ventasDelMes.reduce((sum, venta) => sum + venta.monto, 0);
 
       const payload = {
-        idEmpleado: idEmpleado, 
-        periodo: periodo, 
+        idEmpleado: idEmpleado,
+        periodo: periodo,
         totalVentas: totalVentas,
         montoTotal: montoTotal,
-        llavePrivada: llavePrivada 
+        detallesVentas: JSON.stringify(ventasDelMes), 
+        llavePrivada: llavePrivada
       };
 
       const respuestaServidor = await apiClient.firmarYEnviarReporte(payload);
@@ -172,7 +175,7 @@ export default function App() {
         />
       )}
 
-      {page === 'admin-reportes' && <AdminReportes onNavigate={() => setPage('admin-ventas')} />}
+      {page === 'admin-reportes' && (vistaAdmin === 'reportes' ? (<AdminReportes onCambiarVista={setVistaAdmin} />):(<AdminVentas onCambiarVista={setVistaAdmin} />))}
       {page === 'admin-ventas' && <AdminVentas onNavigate={() => setPage('admin-reportes')} />}
 
       {/* MODALES */}

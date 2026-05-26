@@ -26,6 +26,7 @@ public class ReporteTerminalController {
     // Rutas hacia el Servidor Central (8080)
     private final String SERVER_URL_VENTAS = "http://localhost:8080/api/server/reportes/ventas";
     private final String SERVER_URL_FIRMA = "http://localhost:8080/api/server/reportes/guardar-firmado";
+    private final String SERVER_URL_TODOS = "http://localhost:8080/api/server/reportes/todos";
 
     @Autowired
     private FirmaDigitalService firmaDigitalService;
@@ -62,10 +63,7 @@ public class ReporteTerminalController {
         try {
             // 1. Armamos la Cadena Original (Lo que se va a firmar)
             String cadenaOriginal = firmaDigitalService.generarCadenaOriginal(
-                    dto.getIdEmpleado(), 
-                    dto.getPeriodo(), 
-                    dto.getTotalVentas(), 
-                    dto.getMontoTotal()
+                    dto.getIdEmpleado(), dto.getPeriodo(), dto.getTotalVentas(), dto.getMontoTotal(), dto.getDetallesVentas()
             );
 
             System.out.println("Cifrando cadena original: " + cadenaOriginal);
@@ -91,6 +89,7 @@ public class ReporteTerminalController {
             payloadParaServidorCentral.put("montoTotal", dto.getMontoTotal());
             payloadParaServidorCentral.put("cadenaOriginal", cadenaOriginal);
             payloadParaServidorCentral.put("firmaDigital", firmaDigital);
+            payloadParaServidorCentral.put("detallesVentas", dto.getDetallesVentas());
             // 4. Convertimos a JSON y ENCRIPTAMOS con AES-GCM
             String jsonPlano = objectMapper.writeValueAsString(payloadParaServidorCentral);
             String payloadEncriptadoBase64 = encryptionService.encrypt(jsonPlano, llaveAesEfimera);
@@ -113,6 +112,17 @@ public class ReporteTerminalController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Error al generar la firma digital: Verifica que el archivo .key sea válido.");
+        }
+    }
+    // --- 3. MÉTODO PARA EL ADMIN: VER TODOS LOS REPORTES ---
+    @GetMapping("/todos")
+    public ResponseEntity<?> obtenerTodosLosReportes() {
+        try {
+            ResponseEntity<List> response = restTemplate.getForEntity(SERVER_URL_TODOS, List.class);
+            return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+        } catch (Exception e) {
+            System.err.println("Error conectando al Servidor Central para reportes: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(List.of());
         }
     }
 }

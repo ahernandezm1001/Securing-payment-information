@@ -22,10 +22,8 @@ public class FirmaDigitalService {
     }
 
     // Método que construye la cadena exacta que vamos a "congelar"
-    public String generarCadenaOriginal(Long idEmpleado, String periodo, Integer totalVentas, Double montoTotal) {
-        // Ej: EMPLEADO:1|PERIODO:Mayo 2026|TOTAL_VENTAS:3|MONTO:2600.00
-        return String.format("EMPLEADO:%d|PERIODO:%s|TOTAL_VENTAS:%d|MONTO:%.2f", 
-                idEmpleado, periodo, totalVentas, montoTotal);
+    public String generarCadenaOriginal(Long id, String periodo, int total, double monto, String detalles) { 
+        return "EMPLEADO:" + id + "|PERIODO:" + periodo + "|TOTAL_VENTAS:" + total + "|MONTO:" + monto + "|DETALLES:" + detalles;
     }
 
     // Método que aplica la firma matemática
