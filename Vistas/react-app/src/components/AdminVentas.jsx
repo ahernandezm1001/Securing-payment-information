@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import CrearEmpleadoModal from './CrearEmpleadoModal';
 
-export default function AdminVentas() {
+export default function AdminVentas({ onCambiarVista, onLogout }) {
   const [clienteActivo, setClienteActivo] = useState('Ana Alcántara');
+  const [showCrearModal, setShowCrearModal] = useState(false);
 
   // Datos simulados extraídos de tu HTML
   const clientes = [
@@ -34,14 +36,26 @@ export default function AdminVentas() {
       
       {/* HEADER SUPERIOR */}
       <header className="bg-brand-dark text-white px-8 py-4 flex justify-between items-center shadow-md h-[70px]">
-        <div className="text-xl font-bold">Bienvenido Don Diego</div>
-        <div className="flex gap-4">
-          <button className="bg-brand-primary text-brand-dark font-bold py-2 px-4 rounded-lg hover:bg-brand-accent transition shadow-sm">
+        <div className="text-xl font-bold flex items-center gap-3">
+           <span className="text-brand-teal">Admin:</span> Don Diego
+        </div>
+        <div className="flex gap-4 items-center">
+          <button 
+            onClick={() => setShowCrearModal(true)}
+            className="bg-brand-primary text-brand-dark font-bold py-2 px-4 rounded-lg hover:bg-brand-accent transition flex items-center gap-2 shadow-sm"
+          >
+            <span className="text-xl leading-none">+</span> Nuevo Empleado
+          </button>
+          <button 
+            onClick={() => onCambiarVista('reportes')}
+            className="bg-white bg-opacity-10 text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-20 transition shadow-sm"
+          >
             Reportes mensuales
           </button>
           <button className="bg-brand-teal text-white font-bold py-2 px-4 rounded-lg shadow-sm transition">
-            Ventas
+            Ventas Globales
           </button>
+          <button onClick={onLogout} className="text-gray-400 hover:text-white text-sm font-bold ml-2">Salir</button>
         </div>
       </header>
 
@@ -119,6 +133,7 @@ export default function AdminVentas() {
           ))}
         </div>
       </div>
+      <CrearEmpleadoModal isOpen={showCrearModal} onClose={() => setShowCrearModal(false)} />
     </div>
   );
 }

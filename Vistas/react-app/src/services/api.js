@@ -149,5 +149,15 @@ export const apiClient = {
     const response = await fetch(`${API_BASE_URL}/clientes/todos`);
     if (!response.ok) throw new Error('Error al cargar clientes');
     return await response.json();
+  },
+  async crearEmpleado(nombreCompleto, password) {
+    const response = await fetch('http://localhost:8080/api/server/empleados/crear', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombreCompleto, password })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Error al crear empleado');
+    return data;
   }
 };

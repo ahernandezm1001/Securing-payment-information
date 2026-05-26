@@ -24,4 +24,7 @@ public class Empleado {
     @OneToMany(mappedBy = "empleado")
     private List<Ticket> tickets;
 
+    @Column(name = "llave_publica", columnDefinition = "TEXT")
+    private String llavePublica;
+
 }

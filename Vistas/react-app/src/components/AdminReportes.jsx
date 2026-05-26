@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { apiClient } from '../services/api';
+import CrearEmpleadoModal from './CrearEmpleadoModal';
 
-export default function AdminReportes({ onCambiarVista }) {
+export default function AdminReportes({ onCambiarVista, onLogout }) {
   const [reportes, setReportes] = useState([]);
   const [reporteActivo, setReporteActivo] = useState(null);
   const [cargando, setCargando] = useState(true);
+  const [showCrearModal, setShowCrearModal] = useState(false);
 
   // Cargar datos reales al montar el componente
   useEffect(() => {
@@ -45,17 +47,26 @@ export default function AdminReportes({ onCambiarVista }) {
       
       {/* HEADER PRINCIPAL */}
       <header className="bg-brand-dark text-white px-8 py-4 flex justify-between items-center shadow-md h-[70px]">
-        <div className="text-xl font-bold">Panel de Administrador</div>
-        <div className="flex gap-4">
+        <div className="text-xl font-bold flex items-center gap-3">
+           <span className="text-brand-teal">Admin:</span> Don Diego
+        </div>
+        <div className="flex gap-4 items-center">
+          <button 
+            onClick={() => setShowCrearModal(true)}
+            className="bg-brand-primary text-brand-dark font-bold py-2 px-4 rounded-lg hover:bg-brand-accent transition flex items-center gap-2 shadow-sm"
+          >
+            <span className="text-xl leading-none">+</span> Nuevo Empleado
+          </button>
           <button className="bg-brand-teal text-white font-bold py-2 px-4 rounded-lg shadow-sm transition">
             Reportes mensuales
           </button>
           <button 
             onClick={() => onCambiarVista('ventas')}
-            className="bg-brand-primary text-brand-dark font-bold py-2 px-4 rounded-lg hover:bg-brand-accent transition shadow-sm"
+            className="bg-white bg-opacity-10 text-white font-bold py-2 px-4 rounded-lg hover:bg-opacity-20 transition shadow-sm"
           >
             Ventas Globales
           </button>
+          <button onClick={onLogout} className="text-gray-400 hover:text-white text-sm font-bold ml-2">Salir</button>
         </div>
       </header>
 
@@ -225,6 +236,7 @@ export default function AdminReportes({ onCambiarVista }) {
           )}
         </div>
       </div>
+      <CrearEmpleadoModal isOpen={showCrearModal} onClose={() => setShowCrearModal(false)} />
     </div>
   );
 }
